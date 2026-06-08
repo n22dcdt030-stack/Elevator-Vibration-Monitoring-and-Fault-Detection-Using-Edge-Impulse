@@ -158,6 +158,3 @@ Dự án đã triển khai thành công hệ thống TinyML phát hiện lỗi r
 ## Tác giả
 
 **Trương Nguyễn Duy Khang**
-MSSV: N22DCDT030
-Môn học: Hệ điều hành nhúng
-Học viện Công nghệ Bưu chính Viễn thông (PTIT)
