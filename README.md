@@ -1,0 +1,1 @@
+# Elevator-Vibration-Monitoring-and-Fault-Detection-Using-Edge-Impulse
