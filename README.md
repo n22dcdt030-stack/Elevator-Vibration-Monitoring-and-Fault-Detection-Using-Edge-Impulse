@@ -154,6 +154,134 @@ Dự án đã triển khai thành công hệ thống TinyML phát hiện lỗi r
 * TensorFlow Lite for Microcontrollers
 * ESP-IDF Documentation
 * CMSIS Documentation
+## Sơ đồ kết nối phần cứng
+
+```text
+┌──────────────────────────────────────────────┐
+│                  ESP32-S3 DevKit             │
+├──────────────────────────────────────────────┤
+│                                              │
+│ GPIO8  ───────────────► SDA   [MPU6050]      │
+│ GPIO9  ───────────────► SCL   [MPU6050]      │
+│ 3V3    ───────────────► VCC   [MPU6050]      │
+│ GND    ───────────────► GND   [MPU6050]      │
+│                                              │
+└──────────────────────────────────────────────┘
+
+
+[USB-C từ máy tính]
+          │
+          ▼
+     ESP32-S3 DevKit
+          │
+          ├── Cấp nguồn 3.3V cho MPU6050
+          └── Giao tiếp I2C (GPIO8, GPIO9)
+```
+
+---
+
+## Bảng kết nối chân
+
+| ESP32-S3 DevKit | MPU6050 | Chức năng          |
+| --------------- | ------- | ------------------ |
+| GPIO8           | SDA     | Dữ liệu I2C        |
+| GPIO9           | SCL     | Xung clock I2C     |
+| 3V3             | VCC     | Cấp nguồn cảm biến |
+| GND             | GND     | Mass chung         |
+
+---
+
+## Cấu hình phần cứng
+
+### Vi điều khiển
+
+**ESP32-S3 DevKit**
+
+* CPU: Xtensa LX7 Dual-Core 240 MHz
+* SRAM: 512 KB
+* Flash: 8 MB
+* Hỗ trợ WiFi và Bluetooth
+* Nguồn cấp: USB-C 5V
+
+Vai trò:
+
+* Thu thập dữ liệu cảm biến.
+* Thực hiện xử lý tín hiệu.
+* Chạy mô hình TinyML từ Edge Impulse.
+* Hiển thị kết quả phân loại qua Serial Monitor.
+
+---
+
+### Cảm biến gia tốc
+
+**MPU6050**
+
+* Gia tốc kế 3 trục
+* Con quay hồi chuyển 3 trục
+* Giao tiếp I2C
+* Điện áp hoạt động: 3.3V
+
+Vai trò:
+
+* Đo rung động của mô hình thang máy.
+* Cung cấp dữ liệu accX, accY, accZ cho mô hình TinyML.
+
+---
+
+## Thông số thu thập dữ liệu
+
+| Thông số          | Giá trị          |
+| ----------------- | ---------------- |
+| Tần số lấy mẫu    | 100 Hz           |
+| Số trục đo        | 3                |
+| Dữ liệu đầu vào   | accX, accY, accZ |
+| Kích thước cửa sổ | 2000 ms          |
+| Số mẫu/cửa sổ     | 200              |
+
+---
+
+## Luồng hoạt động hệ thống
+
+```text
+MPU6050
+    │
+    ▼
+Đọc dữ liệu gia tốc
+(accX, accY, accZ)
+    │
+    ▼
+ESP32-S3
+    │
+    ├─► Spectral Analysis (FFT)
+    │
+    ├─► Trích xuất đặc trưng
+    │
+    ├─► TinyML Inference
+    │
+    ▼
+Kết quả phân loại
+
+NORMAL
+MISALIGNMENT
+UNBALANCE
+```
+
+---
+
+## Yêu cầu cấp nguồn
+
+* ESP32-S3 được cấp nguồn qua cổng USB-C từ máy tính.
+* MPU6050 sử dụng nguồn 3.3V trực tiếp từ ESP32-S3.
+* Tất cả các thiết bị phải sử dụng chung GND.
+
+### Lưu ý
+
+* Không cấp nguồn MPU6050 bằng điện áp lớn hơn 3.3V nếu module không có bộ ổn áp tích hợp.
+* Dây SDA và SCL nên ngắn để giảm nhiễu tín hiệu I2C.
+* Kiểm tra địa chỉ I2C của MPU6050 trước khi chạy chương trình (thông thường là `0x68`).
+
+```
+```
 
 ## Tác giả
 
